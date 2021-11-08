@@ -4,7 +4,7 @@
   "description": "Original description: A functional programming language with mutable data thats Royal! This project has been forked on November 7, 2021 in order to add several features I found desirable, such as the 'require' and 'export' functions, as well as fixing various bugs.",
   "main": "src/compiler.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -29,6 +29,6 @@
   },
   "homepage": "https://github.com/grantward1/royalscript-forked#readme",
   "devDependencies": {
-    "@types/core-js": "^0.9.35"
+    "jest": "^27.0.0"
   }
 }

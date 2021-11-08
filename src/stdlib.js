@@ -1,7 +1,7 @@
 //ROYAL SCRIPT STANDARD LIB
 
 //recursively calls sublists of arguments from the lib to unnest the AST
-var callLib = function(lib, first, second){
+const callLib = function(lib, first, second){
   if(typeof second === 'object'){
     if(first in lib) return lib[first](second);
     //if not in lib, assumes user defined function
@@ -11,11 +11,18 @@ var callLib = function(lib, first, second){
     return first;
   }
 };
-
 exports.callLib = callLib;
 
+function wrap(output) {
+  return `(${output})`;
+}
+
+function stringify(expr) {
+  return `JSON.stringify${wrap(expr)}`;
+}
+
 //util function that unnests only 2 arguments from an AST node, otherwise throws error
-var get2Args = function(lib, args){
+const get2Args = function(lib, args){
   switch(args.length){
     case 2:
        if(typeof args[0] === 'string' && typeof args[1] === 'string') return [args[0], args[1]]; 
@@ -40,10 +47,10 @@ var get2Args = function(lib, args){
        throw "Argument Error: Got improper arguments but expected 2.";
   }
 };
-
 exports.get2Args = get2Args;
+
 //same as get2args but only unnests up to a single argument from the AST.
-var get1Args = function(lib, args){
+const get1Args = function(lib, args){
   switch(args.length){
     case 1:
        return args[0];
@@ -56,11 +63,10 @@ var get1Args = function(lib, args){
        throw "Argument Error: Got improper arguments but expected 1.";
   }
 };
-
 exports.get1Args = get1Args;
 
 //special switch function that allows only 3 arguments and unnests them from the AST, throws an error
-var get3Args = function(lib, args){
+const get3Args = function(lib, args){
   switch(args.length){
     case 3:
         if(typeof args[0] === 'string' && typeof args[1] === 'string' && typeof args[2] === 'string') return[args[0], args[1], args[2]];
@@ -94,13 +100,12 @@ var get3Args = function(lib, args){
        throw "Argument Error: Got improper arguments but expected 3.";
   }
 };
-
 exports.get3Args = get3Args;
 
 
 //standard library object
 //functions starting with , are private and cannot be called in the front-end
-var STD = {
+const STD = {
   ",1arg":get1Args,
   ",2arg":get2Args,
   ",3arg":get3Args,
@@ -129,19 +134,19 @@ var STD = {
   },
   //MATH
   "+":function(args){
-    return this[",infix"](" + ", args);
+    return wrap(this[",infix"](" + ", args));
   },
   "-":function(args){
-    return this[",infix"](" - ", args);
+    return wrap(this[",infix"](" - ", args));
   },
   "*":function(args){
-    return this[",infix"](" * ", args);
+    return wrap(this[",infix"](" * ", args));
   },
   "/":function(args){
-    return this[",infix"](" / ", args);
+    return wrap(this[",infix"](" / ", args));
   },
   "%":function(args){
-    return this[",infix"](" % ", args);
+    return wrap(this[",infix"](" % ", args));
   },
   //floor division, calls other function in lib
   "//":function(args) {
@@ -162,39 +167,40 @@ var STD = {
   //COMPARISONS
   //or oper
   "||":function(args){
-    return this[",infix"](" || ", args);
+    return wrap(this[",infix"](" || ", args));
   },
   //and oper
   "&&":function(args){
-    return this[",infix"](" && ", args);
+    return wrap(this[",infix"](" && ", args));
   },
   "==":function(args){
     var elems = get2Args(this, args);
-    return elems[0] + " === " + elems[1];
+    return wrap(`${elems[0]} === ${elems[1]}`);
   },
   "!=":function(args){
     var elems = get2Args(this, args);
-    return elems[0] + " !== " + elems[1];
+    return wrap(`${elems[0]} !== ${elems[1]}`);
   },
   ">":function(args){
     var elems = get2Args(this, args);
-    return elems[0] + " > " + elems[1];
+    return wrap(`${elems[0]} > ${elems[1]}`);
   },
   "<":function(args){
     var elems = get2Args(this, args);
-    return elems[0] + " < " + elems[1];
+    return wrap(`${elems[0]} < ${elems[1]}`);
   },
   "<=":function(args){
     var elems = get2Args(this, args);
-    return elems[0] + " <= " + elems[1];
+    return wrap(`${elems[0]} <= ${elems[1]}`);
   },
   ">=":function(args){
     var elems = get2Args(this, args);
-    return elems[0] + " >= " + elems[1];
+    return wrap(`${elems[0]} >= ${elems[1]}`);
   },
   //takes one argument but can be extended with args
   "not":function(args){
-    return "!(" + get1Args(this, args) + ")";
+    const arg = get1Args(this, args);
+    return `!${wrap(arg)}`;
   },
   //ASSIGNMENT function
   "=":function(args){
@@ -208,8 +214,8 @@ var STD = {
   },
   //SAME FUNCTION compares using JSON stringify
   "same":function(args){
-    var elems = get2Args(this, args);
-    return "JSON.stringify(" + elems[0] + ") === JSON.stringify(" + elems[1] + ")";
+    const elems = get2Args(this, args);
+    return this["=="](elems.map(stringify));
   },
   //MATCH FUNCTION performs regex match on left operand string
   //returns boolean if match
@@ -487,14 +493,12 @@ var STD = {
     return  "(" + get1Args(this, args) + ").constructor.name";
   }
 };
-
 exports.STD = STD;
 
 //top level function that generates javascript
-var genCode = function(AST){ 
+const genCode = function(AST){ 
   return STD[",infix"]("\n", AST);
 };
-
 exports.genCode = genCode;
 
 //var obj = ['=', ['a', '@', ['elem', '+', ['elem', '2']]]];
