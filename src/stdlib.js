@@ -201,6 +201,11 @@ var STD = {
     var elems = get2Args(this, args);
     return "var " + elems[0] + " = " + elems[1] + ";";
   },
+  //Dot function, get properties
+  //TODO: check args
+  ".": function(args){
+    return `${args[0]}.${args[1]}`;
+  },
   //SAME FUNCTION compares using JSON stringify
   "same":function(args){
     var elems = get2Args(this, args);

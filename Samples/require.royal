@@ -1,0 +1,6 @@
+;Requires some functionality from a JS module,
+with webpack you should be able to require from other Royalscript modules;
+
+=(jsmod, require(`./Samples/export.js`))
+,=(add5, .(jsmod, add5))
+,add5(6)
