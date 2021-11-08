@@ -1,14 +1,14 @@
 {
-  "name": "royalscript",
-  "version": "1.0.6",
-  "description": "A functional programming language with mutable data thats Royal!",
+  "name": "royalscript-forked",
+  "version": "1.0.0",
+  "description": "Original description: A functional programming language with mutable data thats Royal! This project has been forked on November 7, 2021 in order to add several features I found desirable, such as the 'require' and 'export' functions, as well as fixing various bugs.",
   "main": "Main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jweinst1/Royalscript.git"
+    "url": "git+https://github.com/grantward1/royalscript-forked.git"
   },
   "preferGlobal": true,
   "bin": {
@@ -22,12 +22,12 @@
     "interpreter",
     "scheme"
   ],
-  "author": "Joshua Weinstein <jweinst1@berkeley.edu> (https://github.com/jweinst1)",
+  "author": "Grant Ward <gw1@email.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jweinst1/Royalscript/issues"
+    "url": "https://github.com/grantward1/royalscript-forked/issues"
   },
-  "homepage": "https://github.com/jweinst1/Royalscript#readme",
+  "homepage": "https://github.com/grantward1/royalscript-forked#readme",
   "devDependencies": {
     "@types/core-js": "^0.9.35"
   }
