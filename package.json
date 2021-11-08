@@ -2,7 +2,7 @@
   "name": "royalscript-forked",
   "version": "1.0.0",
   "description": "Original description: A functional programming language with mutable data thats Royal! This project has been forked on November 7, 2021 in order to add several features I found desirable, such as the 'require' and 'export' functions, as well as fixing various bugs.",
-  "main": "Main.js",
+  "main": "src/compiler.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,7 +12,7 @@
   },
   "preferGlobal": true,
   "bin": {
-    "royalscript": "Main.js"
+    "royalscript": "royalscript.js"
   },
   "keywords": [
     "functional",
