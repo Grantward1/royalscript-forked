@@ -68,9 +68,7 @@ royalscript -e path/to/royalscriptfile
 
 You can also import the royalscript module and use the exported `Compile` function in your node programs.
 
-## Computational Functions
-
-The major difference between RoyalScript and other functional languages like Scheme, is that RoyalScript functions do not *always* evaluate to some resulting value. They do not always return a value. Some functions, such as the `for` function, loops over some list of values. Another example is the (Missing).
+## Functions
 
 RoyalScript is meant to offer more options for computation than just recursion, although recursion is definitely usable. 
 
@@ -882,86 +880,13 @@ undefined
 
 ```
 
-## Procs (1 or 2 argument functions)
-
-RoyalScript has both general, full length functions that can be defined, but it also has smaller, anonymously created functions called Procs. They are similar to lambdas in other languages. 
-
-### `@(parameter, call_exp)`
-
-The `@()` function creates and evaluates to an unnamed, one argument function with only a single execution statement. These are very useful for loops and quick, small areas you need to update values and compute values.
-
-```
->> =(e, @(first, +(first, 3)))
-undefined
->> e(3)
-6
->> e(8)
-11
->> =(e, @(first, +(first, 3), -(first, 3)))
-Argument Error: Got improper arguments but expected 2.
-```
-
-Procs made with `@()` always return their statement, so you do not need to specify a `return()` function.
-
-Because there first statement is returned, you cannot extend them with `do()`.
-
-### `@@(param1, param2, call_exp)`
-
-The `@@()` works identically to the `@()` except that it evaluates to a proc the has two parameters and returns its only execution statement.
-
-```
->> =(add, @@(a, b, +(a, b)))
-undefined
->> add(1, 2)
-3
->> add(1, add(1, 3))
-5
-```
-
-Double parameter procs can also be nested.
-
-### `!@(parameter, call_exp)`
-
-The `!@()` function produces a proc very similarly to the `@()` function except it does not return or evaluate to any value when the proc is called. It's specifically meant to modify mutable arguments like lists or structs, or be used in a loop.
-
-```
->> =(attach, !@(a, append(a, 3)))
-undefined
->> =(test, make(4, 10))
-undefined
->> attach(test)
-undefined
->> do(test)
-[4,4,4,4,4,4,4,4,4,4,3]
->> attach(list(1, 2 ,3))
-undefined ;does not return the list;
-```
-
-Unlike the other procs, however, `!@()` can be extended with `do()`, as in the example below
-
-```
->> =(fnc, !@(a,
-..         do(
-..            append(a, 1),
-..            remove(a, 0),
-..            put(a, 3)
-..            )
-..          )
-..      )
-undefined
->> =(lst, list(1, 2))
-undefined
->> fnc(lst), do(lst)
-[3,2,1]
-```
-
 ## Loop Functions
 
 Unlike most other functional programming languages, RoyalScript has loops, a conditional loop and a for loop. These exist to add more flexibility in writing RoyalScript than purely using recursion as the primary tool of computation.
 
 ### `loop(bool_exp, call_exp)`
 
-The `loop()` function in RoyalScript repeatedly calls a single statement while the boolean expression, also called a condition evaluates to true. The call expression, like that in `!@()` can be extended with the `do()` function.
+The `loop()` function in RoyalScript repeatedly calls a single statement while the boolean expression, also called a condition evaluates to true. The call expression can be extended with the `do()` function.
 
 Here is a small, RoyalScript program that uses a loop to sum the values in a list. This is a compiled program, as opposed to the REPL used in the previous examples.
 
@@ -992,7 +917,7 @@ This is a program that loops over a range and inserts the numbers greater than 3
 =(r, list()),
 
 for(range(0, 10),
-         !@( elem,
+         lambda(args(elem),
              do(
                 ?(>(elem, 3), insert(r, 0, elem))
                 )
@@ -1009,7 +934,7 @@ Something important to understand is that unless directly accessing the name of 
 ```
 =(lst, list(1, 2, 3)),
 for(lst, 
-    !@(elem, +(elem, 2))
+    lambda(args(elem), +(elem, 2))
     )
 ,do(lst)
 ;[1,2,3];
@@ -1027,28 +952,20 @@ Here is an example using a single parameter proc that gets the squares from a ra
 
 ```
 map(range(0, 10),
-         @(x, **(x, 2))
+         lambda(args(x), **(x, 2))
          )
 ;[0,1,4,9,16,25,36,49,64,81];
-```
-A double parameter proc, `@@()` can also be used for this:
-
-```
-map(range(0, 10),
-         @@(a, b, list(a, b))
-         )
-;[[0,0],[1,1],[2,2],[3,3],[4,4],[5,5],[6,6],[7,7],[8,8],[9,9]];
 ```
 
 ### `filter(list, function_proc -> Boolean)`
 
-The `filter()` function in RoyalScript takes a list and a function or proc that takes one argument and returns a boolean value. It goes through a list, and checks if eahc value returns true or false from the proc or function. It then returns a new list for all the values that made the function or proc return true.
+The `filter()` function in RoyalScript takes a list and a function that takes one argument and returns a boolean value. It goes through a list, and checks if eahc value returns true or false from the proc or function. It then returns a new list for all the values that made the function or proc return true.
 
 This is a program that filters a list for only the even numbers.
 
 ```
 filter(range(0, 20),
-            @(item, ==(0, %(item, 2)))
+            lambda(args(item), ==(0, %(item, 2)))
             )
 ;[0,2,4,6,8,10,12,14,16,18];
 ```
@@ -1059,8 +976,8 @@ To make these more powerful, you can also chain map and filter calls to make a l
 map(
     filter(
            range(0, 20), 
-           @(item, ==(0, %(item, 2)))),
-    @(elem, //(elem, 3))
+           lambda(args(item), ==(0, %(item, 2)))),
+    lambda(args(elem), //(elem, 3))
     )
 
 ;[0,0,1,2,2,3,4,4,5,6];

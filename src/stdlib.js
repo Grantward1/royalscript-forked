@@ -479,22 +479,6 @@ const STD = {
          return "return [" + this[","](args) + "];";
     }
   },
-  //single statement function, only takes one parameter, anonymous
-  "@":function(args){
-    var elems = get2Args(this, args);
-    return "function(" + elems[0] + "){return " + elems[1] + "}";
-  },
-  //double parameter, single statement function, anonymous
-  "@@":function(args){
-    var elems = get3Args(this, args);
-    if(typeof elems[1] === 'object') throw "Name Error: paramter must be literal";
-    return "function(" + elems[0] +  "," + elems[1] + "){return " + elems[2] + "}";
-  },
-  //single paramter function thats anonymous with no return statement, useful for for loops
-  "!@":function(args){
-    var elems = get2Args(this, args);
-    return "function(" + elems[0] + "){" + elems[1] + "}";
-  },
   //LOOPING FUNCTIONS
   //condition loop single statement
   "loop":function(args){

@@ -1,0 +1,7 @@
+;Evaluate inputs for given condition;
+
+defun(even, args(n), ==(0, %(n, 2))),
+export(even, even),
+
+defun(odd, args(n), !(even(n))),
+export(odd, odd)
