@@ -1,4 +1,4 @@
 ;Defines a function and exports it;
 
-def(add5, args(n), +(n, 5))
+defun(add5, args(n), +(n, 5))
 ,export(add5, add5)

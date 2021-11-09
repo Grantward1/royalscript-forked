@@ -21,6 +21,37 @@ function stringify(expr) {
   return `JSON.stringify${wrap(expr)}`;
 }
 
+function even(num) {
+  return (0 === (num % 2));
+}
+
+function splitArgs(args) {
+  var funcs = [];
+  var passed = [];
+  for (var i=0; i<args.length; i++) {
+    if (even(i)) {
+      funcs.push(args[i]);
+    } else {
+      passed.push(args[i]);
+    }
+  }
+  return [funcs, passed];
+}
+
+function mergeArgs(funcs, passed) {
+  var args = [];
+  const numFuncs = funcs.length;
+  const numPassed = passed.length;
+  if (numFuncs !== numPassed) {
+    throw `${numFuncs} functions called, but only ${numPassed} sets of args.`;
+  }
+  for (var i=0; i<numFuncs; i++) {
+    args.push(funcs[i]);
+    args.push(passed[i]);
+  }
+  return args;
+}
+
 //util function that unnests only 2 arguments from an AST node, otherwise throws error
 const get2Args = function(lib, args){
   switch(args.length){
@@ -316,7 +347,22 @@ const STD = {
   },
   //allows a sequence of functions to be grouped together for control flow or other purposes as a single arg.
   "do":function(args){
-    return this[",infix"]("\n", args);
+    const split = splitArgs(args);
+    var funcs = split[0];
+    var passed = split[1];
+    if (0 < funcs.length) {
+      var lastFunc = funcs.pop();
+      var lastPassed = passed.pop();
+      if (lastFunc !== 'return') {
+        lastPassed = [lastFunc, lastPassed];
+        lastFunc = 'return';
+      }
+      funcs.push(lastFunc);
+      passed.push(lastPassed);
+    }
+    args = mergeArgs(funcs, passed);
+    const content = this[",infix"](";", args);
+    return `(() => {${content}})()`;
   },
   //CONDITIONALS
   //singular Conditional function
@@ -396,19 +442,18 @@ const STD = {
     return str + "else{" + callLib(this, args[i], args[i+1]) + "};";
   },
   //FUNCTION DECLARATION
-  "def":function(args){
+  "defun":function(args){
     var len = args.length;
     if(args[0] in this) throw "Illegal Name Error: Cannot choose reserved function name";
     if(typeof args[1] === 'object') throw "Name Error: function name must be literal";
     if(args[1] !== 'args') throw "Call Error: function must be defined with args list";
-    var str = "function " + args[0] + "(" + callLib(this, args[1], args[2]) + "){";
-    for (var i = 3; i<len; i++) {
-      if(!(typeof args[i] === 'object')){
-        str += callLib(this, args[i], args[i+1]);
-      }
-    };
-    //needs return function
-    return str + "}";
+    return this['=']([args[0], this['lambda'](args.slice(1))]);
+  },
+  //Create a function inline
+  "lambda": function(args) {
+    const params = wrap(callLib(this, args[0], args[1]));
+    const content = this['do'](args.slice(2));
+    return wrap(`${params} => ${content}`);
   },
   //Exporting functions or values
   //TODO: check args length
@@ -497,7 +542,7 @@ exports.STD = STD;
 
 //top level function that generates javascript
 const genCode = function(AST){ 
-  return STD[",infix"]("\n", AST);
+  return STD[",infix"](";\n", AST);
 };
 exports.genCode = genCode;
 

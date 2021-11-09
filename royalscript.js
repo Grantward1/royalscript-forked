@@ -5,7 +5,6 @@ var fs = require('fs');
 var userArgs = process.argv.slice(2);
 
 
-
 //reads string from file
 fs.readFile(userArgs[1], 'utf-8', function (err, data) {
     if (err) throw err;

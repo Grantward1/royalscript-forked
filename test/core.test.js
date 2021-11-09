@@ -12,4 +12,9 @@ describe('Ensure accurate output from core language features', () => {
     const expr = '*(5, -(0, 1))';
     expect(eval(cmp(expr))).toBe(-5);
   });
+  test('Define and use function', () => {
+    const expr = (
+      'defun(summinus1, args(x, y), -(+(x, y), 1)),summinus1(10, 9)');
+    expect(eval(cmp(expr))).toBe(18);
+  });
 });

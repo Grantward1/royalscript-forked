@@ -1067,18 +1067,22 @@ map(
 ```
 This is a chain using the previous filter and mapping that list to a new list with all the elements in the previous list floor divided by 3.
 
-## Defining Functions
+## Functions
 
 RoyalScript allows you to define your own full size functions, which take any amount of parameters and have any amount of statements you want. RoyalScript also uses a special function, `return()`, which allows you to return nothing, one value, or multiple values in a list.
 
-### `def(name, args_exp, call_exp...)`
+### `lambda(args_expr, call_exp*)`
 
-The `def()` function is the function which defines new named functions. Functions are much more flexible and powerful than procs, because they are named, they can have any amount of parameters, any amount of call expressions, and either return a value, or not, or have multiple return statements in different parts of the function, such as with control flow.
+The `lambda()` returns a new anonymous function. It has the same syntax and rules as `defun()` minus the name.
+
+### `defun(name, args_exp, call_exp...)`
+
+The `defun()` function is the function which defines new named functions.
 
 This is a simple function with calculates the factorial of some number recursively.
 
 ```
-def(factorial,
+defun(factorial,
     args(n),
     if(==(n, 1),
          return(1),
@@ -1094,7 +1098,7 @@ def(factorial,
 You can also define functions with no parameters:
 
 ```
-def(noparams,
+defun(noparams,
     args(),
     return(true, true)
     )
@@ -1105,7 +1109,7 @@ def(noparams,
 However, you can't define a function that is already a standard library function in RoyalScript.
 
 ```
-def(range,
+defun(range,
     args(),
     return(list())
     )
@@ -1119,7 +1123,7 @@ Here is an example using a larger function for mapping
 
 ```
 map(range(0, 10),
-         def(_, args(a),
+         defun(_, args(a),
                 ;prints the value to console;
                 $(a),
                 return(a, +(a, 1))
@@ -1184,13 +1188,10 @@ The `new()` function creates a new instance of a struct. You must use a previous
 You can also have functions return new instances of structs
 
 ```
-def(factory,
+defun(factory,
     args(amount, size),
     struct(machine, size, built),
-    return(
-           make(new(machine, size, true), amount)
-           )
-    ),
+    make(new(machine, size, true), amount)),
 factory(5)
 ;[{"built":true},{"built":true},{"built":true},{"built":true},{"built":true}];
 ```
